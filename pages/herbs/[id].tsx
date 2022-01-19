@@ -4,6 +4,7 @@ import { useRouter } from "next/router"
 import { FormEvent, useRef } from "react"
 import database from "../../lib/database"
 import toast, { Toaster } from 'react-hot-toast'
+import Container from "../../components/Container/Container"
 export default function Edit({ data }) {
     const router = useRouter()
     const updateFormRef = useRef<HTMLFormElement>(null)
@@ -47,7 +48,7 @@ export default function Edit({ data }) {
 
     return <>
         {/* Herb Edit Form */}
-        <div className="container notification my-3">
+        <Container>
             <div className="title">
                 Herb Edit Form
             </div>
@@ -110,14 +111,18 @@ export default function Edit({ data }) {
                 </div>
                 <div className="field">
                     <div className="control">
-                        <button className="button is-primary">
-                            Update
-                        </button>
+                        <div className="buttons">
+                            <button className="button is-primary">
+                                Update
+                            </button>
+                            <button className="button is-danger" onClick={(e) => { e.preventDefault(); router.back() }}>
+                                Go Back
+                            </button>
+                        </div>
                     </div>
                 </div>
             </form>
-        </div>
-        <Toaster></Toaster>
+        </Container>
     </>
 }
 

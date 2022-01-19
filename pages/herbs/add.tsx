@@ -37,7 +37,7 @@ export default function AddHerbs() {
             toast.promise(result, {
                 loading: 'Adding herb...',
                 success: 'Successfully added herb',
-                error: (err) => { console.log(err.message); return 'Error.. Make Sure To The Name is Unique'}
+                error: (err) => { console.log(err.message); return 'Error.. Make Sure To The Name is Unique' }
             });
 
         } catch (err) {
@@ -47,72 +47,77 @@ export default function AddHerbs() {
     return (
         <Container>
             <h1 className="title is-4">Add Herb</h1>
-            <form className="form" onSubmit={handleAddHerb}>
-                <div className="field">
-                    <label className="label">
-                        Name:
-                    </label>
-                    <div className="control">
-                        <input type="text" className="input" name="name" required />
-                    </div>
+            <div className="columns">
+                <div className="column is-7">
+                    <form className="form" onSubmit={handleAddHerb}>
+                        <div className="field">
+                            <label className="label is-small">
+                                Name
+                            </label>
+
+                            <div className="control">
+                                <input type="text" className="input" name="name" required />
+                            </div>
+                        </div>
+
+                        <div className="field">
+                            <label className="label is-small">
+                                Botanical Name:
+                            </label>
+                            <div className="control">
+                                <input type="text" className="input" name="botanical_name" required />
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label is-small">
+                                Unit:
+                            </label>
+                            <div className="control">
+                                <input type="text" className="input" name="unit" required />
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label is-small">
+                                Quantity:
+                            </label>
+                            <div className="control">
+                                <input type="number" className="input" name="quantity" required />
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label is-small">
+                                Re-Order Level Inventory:
+                            </label>
+                            <div className="control">
+                                <input type="number" className="input" name="reorder_level" required />
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label is-small">
+                                Purchase Price:
+                            </label>
+                            <div className="control">
+                                <input type="number" className="input" name="purchase_price" required />
+                            </div>
+                        </div>
+                        <div className="field">
+                            <label className="label is-small">
+                                Selling Price:
+                            </label>
+                            <div className="control">
+                                <input type="number" className="input" name="selling_price" required />
+                            </div>
+                        </div>
+                        <div className="field">
+                            <div className="control">
+                                <button className="button is-primary">
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <div className="field">
-                    <label className="label">
-                        Botanical Name:
-                    </label>
-                    <div className="control">
-                        <input type="text" className="input" name="botanical_name" required />
-                    </div>
-                </div>
-                <div className="field">
-                    <label className="label">
-                        Unit:
-                    </label>
-                    <div className="control">
-                        <input type="text" className="input" name="unit" required />
-                    </div>
-                </div>
-                <div className="field">
-                    <label className="label">
-                        Quantity:
-                    </label>
-                    <div className="control">
-                        <input type="text" className="input" name="quantity" required />
-                    </div>
-                </div>
-                <div className="field">
-                    <label className="label">
-                        Re-Order Level Inventory:
-                    </label>
-                    <div className="control">
-                        <input type="text" className="input" name="reorder_level" required />
-                    </div>
-                </div>
-                <div className="field">
-                    <label className="label">
-                        Purchase Price:
-                    </label>
-                    <div className="control">
-                        <input type="text" className="input" name="purchase_price" required />
-                    </div>
-                </div>
-                <div className="field">
-                    <label className="label">
-                        Selling Price:
-                    </label>
-                    <div className="control">
-                        <input type="text" className="input" name="selling_price" required />
-                    </div>
-                </div>
-                <div className="field">
-                    <div className="control">
-                        <button className="button is-primary">
-                            Add
-                        </button>
-                    </div>
-                </div>
-            </form>
-            <Toaster></Toaster>
+            </div>
         </Container>
     )
 }

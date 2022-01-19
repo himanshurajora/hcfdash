@@ -1,12 +1,16 @@
 import Head from 'next/head'
 import Image from 'next/image'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
+import Container from '../components/Container/Container'
 export default function Home() {
+
   return (
-      <main className='container notification my-2'>
+    <>
+      <Container>
         <div className="title">
           Business Statics Will Be Here
         </div>
-      </main>
+      </Container>
+    </>
   )
 }
