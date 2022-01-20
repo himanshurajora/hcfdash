@@ -73,7 +73,12 @@ export default function AddHerbs() {
                                 Unit:
                             </label>
                             <div className="control">
-                                <input type="text" className="input" name="unit" required />
+                                <select className="input" name="unit" required>
+                                    <option value="g">gm</option>
+                                    <option value="kg">kg</option>
+                                    <option value="l">l</option>
+                                    <option value="ml">ml</option>
+                                </select>
                             </div>
                         </div>
                         <div className="field">
@@ -86,7 +91,7 @@ export default function AddHerbs() {
                         </div>
                         <div className="field">
                             <label className="label is-small">
-                                Re-Order Level Inventory:
+                                Low Level Inventory:
                             </label>
                             <div className="control">
                                 <input type="number" className="input" name="reorder_level" required />

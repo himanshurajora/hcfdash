@@ -9,11 +9,46 @@ create table herbs (
     unique (name),
     botanical_name varchar(255) not null,
     unit varchar(255) not null,
-    quantity int not null,
-    reorder_level int not null,
-    purchase_price int not null,
-    selling_price int not null,
+    quantity float not null,
+    reorder_level float not null,
+    purchase_price float not null,
+    selling_price float not null,
     created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp on update current_timestamp
 );
 
+-- The purchses Table
+
+drop table if exists purchases;
+
+create table purchases (
+    id int not null auto_increment,
+    purchase_date date not null,
+    remarks varchar(255) not null,
+    invoice_no varchar(255) not null,
+    total_amount float not null,
+    product_type varchar(255) not null default 'Herbs',
+    primary key (id),
+    unique (invoice_no),
+    created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp on update current_timestamp
+);
+
+-- The Purchase_Herbs Tables, This table is connected to the purchases table
+-- It will store the details of the herbs purchased
+
+drop table if exists purchase_herbs;
+
+create table purchase_herbs (
+    id int not null auto_increment,
+    purchase_id int not null,
+    herb_id int not null,
+    herb_name varchar(255) not null,
+    quantity float not null,
+    purchase_price float not null,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp on update current_timestamp,
+    primary key (id),
+    foreign key (purchase_id) references purchases(id),
+    foreign key (herb_id) references herbs(id)
+);

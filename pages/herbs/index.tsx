@@ -1,6 +1,6 @@
 import Container from "../../components/Container/Container";
 import { Toaster } from "react-hot-toast";
-export default function Herbs() {
+export default function Herbs({data}) {
 
     return (
         <>
@@ -12,3 +12,4 @@ export default function Herbs() {
         </>
     )
 }
+

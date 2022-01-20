@@ -54,7 +54,7 @@ export default function Edit({ data }) {
             </div>
             <form className="form" ref={updateFormRef} onSubmit={handleUpdateHerb}>
                 <div className="field">
-                    <label className="label">
+                    <label className="label is-small">
                         Name:
                     </label>
                     <div className="control">
@@ -62,7 +62,7 @@ export default function Edit({ data }) {
                     </div>
                 </div>
                 <div className="field">
-                    <label className="label">
+                    <label className="label is-small">
                         Botanical Name:
                     </label>
                     <div className="control">
@@ -70,7 +70,7 @@ export default function Edit({ data }) {
                     </div>
                 </div>
                 <div className="field">
-                    <label className="label">
+                    <label className="label is-small">
                         Unit:
                     </label>
                     <div className="control">
@@ -78,35 +78,40 @@ export default function Edit({ data }) {
                     </div>
                 </div>
                 <div className="field">
-                    <label className="label">
+                    <label className="label is-small">
                         Quantity:
                     </label>
                     <div className="control">
-                        <input type="text" className="input" name="quantity" defaultValue={data.quantity} required />
+                        <select className="input" name="unit" required>
+                            <option value="g">gm</option>
+                            <option value="kg">kg</option>
+                            <option value="l">l</option>
+                            <option value="ml">ml</option>
+                        </select>
                     </div>
                 </div>
                 <div className="field">
-                    <label className="label">
+                    <label className="label is-small">
                         Re-Order Level Inventory:
                     </label>
                     <div className="control">
-                        <input type="text" className="input" name="reorder_level" defaultValue={data.reorder_level} required />
+                        <input type="number" className="input" name="reorder_level" defaultValue={data.reorder_level} required />
                     </div>
                 </div>
                 <div className="field">
-                    <label className="label">
+                    <label className="label is-small">
                         Purchase Price:
                     </label>
                     <div className="control">
-                        <input type="text" className="input" defaultValue={data.purchase_price} name="purchase_price" required />
+                        <input type="number" className="input" defaultValue={data.purchase_price} name="purchase_price" required />
                     </div>
                 </div>
                 <div className="field">
-                    <label className="label">
+                    <label className="label is-small">
                         Selling Price:
                     </label>
                     <div className="control">
-                        <input type="text" className="input" defaultValue={data.selling_price} name="selling_price" required />
+                        <input type="number" className="input" defaultValue={data.selling_price} name="selling_price" required />
                     </div>
                 </div>
                 <div className="field">
@@ -115,7 +120,7 @@ export default function Edit({ data }) {
                             <button className="button is-primary">
                                 Update
                             </button>
-                            <button className="button is-danger" onClick={(e) => { e.preventDefault(); router.back() }}>
+                            <button className="button is-danger" onClick={(e) => { e.preventDefault(); router.push(`/herbs/view?search=${router.query.search ? router.query.search : ""}`) }}>
                                 Go Back
                             </button>
                         </div>

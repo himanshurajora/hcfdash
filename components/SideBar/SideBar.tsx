@@ -27,9 +27,21 @@ export default function SideBar() {
                                 </Link>
                             </li>
                         </ul>
+                        <Link href={'/herbs'}>Herbs Inventory</Link>
+                        <ul>
+                            <li>
+                                <Link href={'/herbs/inventory/add'}>
+                                    Add Inventory 
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href={'/herbs/view'}>
+                                    View Invoices
+                                </Link>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
-
             </aside>
         </>
     )
