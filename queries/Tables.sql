@@ -29,7 +29,6 @@ create table purchases (
     total_amount float not null,
     product_type varchar(255) not null default 'Herbs',
     primary key (id),
-    unique (invoice_no),
     created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp on update current_timestamp
 );

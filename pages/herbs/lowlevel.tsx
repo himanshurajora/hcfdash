@@ -84,6 +84,7 @@ export default function ViewHerbs({ data }) {
     }
 
     const handleSort = (sort_p, sortType_p) => {
+        console.log(sort_p, sortType_p);
         switch (sort_p) {
             case "None":
                 setHerbs(data)
@@ -155,9 +156,9 @@ export default function ViewHerbs({ data }) {
                             >
                                 Delete Multiple
                             </button>
-                            <Link href={"/herbs/lowlevel"}>
+                            <Link href={"/herbs/view"}>
                                 <button className="button is-warning">
-                                   Below Low Level
+                                    All Herbs
                                 </button>
                             </Link>
                         </div>
@@ -322,7 +323,7 @@ export default function ViewHerbs({ data }) {
 
 export async function getServerSideProps() {
 
-    const result: any = await database.query(`SELECT * FROM herbs`)
+    const result: any = await database.query(`SELECT * FROM herbs where quantity < reorder_level`)
     // convert result to json
     const data = JSON.parse(JSON.stringify(result))
     database.end()

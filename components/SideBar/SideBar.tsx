@@ -35,7 +35,7 @@ export default function SideBar() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href={'/herbs/view'}>
+                                <Link href={'/herbs/inventory/view'}>
                                     View Invoices
                                 </Link>
                             </li>

@@ -16,8 +16,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === "POST") {
         const { date, invoice_no, remarks, total_amount, herbsList } = req.body
         try {
-            // log all the data
-            console.log(date, invoice_no, remarks, total_amount, herbsList as IHerbs)
             // date, invoice_no, remarks and created_at, updated_at are auto added by mysql
             // there is a purchases table 
 

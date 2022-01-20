@@ -4,12 +4,13 @@ import Container from "../../../components/Container/Container";
 import toast, { Toaster } from "react-hot-toast";
 import database from "../../../lib/database";
 import Autocomplete from "react-autocomplete";
-export default function AddInvetory({ data }) {
-    var date = new Date();
-    const [dateInput, setDateInput] = useState(`${date.getFullYear()}-${date.getMonth() + 1 < 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${date.getDate() < 9 ? '0' + date.getDate() : date.getDate()}`)
+import { useRouter } from "next/router";
 
-    const [herbsList, setHerbsList] = useState([]);
+export default function EditInvoice({ data }) {
+    const [herbsList, setHerbsList] = useState(data.herbsList);
     const [totalAmount, setTotalAmount] = useState(0);
+    const router = useRouter()
+    console.log(data);
     useEffect(() => {
         // set the total amount
         if (herbsList.length !== 0) {
@@ -24,17 +25,35 @@ export default function AddInvetory({ data }) {
         console.log(herbsList)
     }, [herbsList])
 
-    const handleAddHerb = async (e: FormEvent) => {
-
+    const handleDeleteHerb = async (purchase_id, herb_id,  index) => {
+        // send post request to /api/invoice/removeherb
+        if(confirm("Are you sure you want to delete this herb?")) {
+            const response = axios.post("/api/invoice/removeherb", {
+                purchase_id,
+                herb_id,
+                quantity: data.herbsList[index].quantity
+            })
+            // toast the response
+            toast.promise(response, {
+                loading: "Removing herb...",
+                success: "Herb removed successfully",
+                error: "Error removing herb"
+            })
+            // update the herbsList
+            const newHerbsList = [...herbsList]
+            newHerbsList.splice(index, 1)
+            setHerbsList(newHerbsList)
+        }else{
+            // toast 
+            toast.error("Herb not removed, It might be a mistake")
+        }
     }
 
-    const handleAddPurchase = async (e: FormEvent) => {
+    const handleUpdateInvoice = async (e: FormEvent) => {
         e.preventDefault()
         // get form data
         const form = e.target as HTMLFormElement
         const formData = new FormData(form)
-        // get date
-        const date = formData.get("date")
         // get invoice_no
         const invoice_no = formData.get("invoice_no")
         // get remarks
@@ -46,51 +65,35 @@ export default function AddInvetory({ data }) {
             total_amount += parseInt(herb.purchase_price)
         })
 
-        if (herbsList.length == 0) {
-            toast.error('Add atleast one herb');
-            return;
-        } else {
-            // push all the data to /api/invoice/add
-            let isOkey = true;
-            let herbname = '';
-            herbsList.forEach((herb) => {
-                if (!herb.id) {
-                    // toast select the herb from dropdown
-                    isOkey = false;
-                    herbname = herb.name;
-                }
+        var result
+        try {
+            result = axios.post('/api/invoice/update', {
+                "purchase_id": data.purchase_id,
+                invoice_no,
+                remarks,
+                total_amount,
+                herbsList
             })
-            if (isOkey) {
-                var result
-                try {
-                    result = axios.post('/api/invoice/add', {
-                        date,
-                        invoice_no,
-                        remarks,
-                        total_amount,
-                        herbsList
-                    })
-                    toast.promise(result, {
-                        loading: 'Adding purchase...',
-                        success: 'Successfully added purchase',
-                        error: (err) => { console.log(err.message); return 'Error.. Make Sure Invoice No. Is Unique' }
-                    });
-                } catch (err) {
-                    console.log(result)
-                }
-            }else{
-                toast.error(`Please select the herb ${herbname} from dropdown`);
-            }
-
+            toast.promise(result, {
+                loading: 'Adding purchase...',
+                success: 'Successfully added purchase',
+                error: (err) => { console.log(err.message); return 'Error.. Make Sure Invoice No. Is Unique' }
+            });
+        } catch (err) {
+            console.log(result)
         }
+
     }
 
     return (
         <Container>
+            <div className="title">
+                Edit Invoice
+            </div>
             <h1 className="title is-4">Add Inventory</h1>
             <div className="columns">
                 <div className="column is-12">
-                    <form className="form" onSubmit={handleAddPurchase}>
+                    <form className="form" onSubmit={handleUpdateInvoice}>
                         <div className="columns">
                             <div className="column is-6 is-12-mobile">
                                 <div className="field">
@@ -98,7 +101,13 @@ export default function AddInvetory({ data }) {
                                         Date
                                     </label>
                                     <div className="control">
-                                        <input type="date" value={dateInput} onChange={(e) => { setDateInput(e.target.value) }} className="input" name="date" required />
+                                        <input type="text" defaultValue={
+                                            // convert data.purchase_date to dd-mm-yyyy
+                                            data.purchase_date ?
+                                                data.purchase_date.split('T')[0].split('-').reverse().join('-')
+                                                :
+                                                ''
+                                        } className="input" disabled name="date" />
                                     </div>
                                 </div>
                             </div>
@@ -108,7 +117,11 @@ export default function AddInvetory({ data }) {
                                         Invoice No.
                                     </label>
                                     <div className="control">
-                                        <input type="text" className="input" name="invoice_no" required />
+                                        <input type="text" className="input"
+                                            defaultValue={
+                                                data.invoice_no
+                                            }
+                                            name="invoice_no" required />
                                     </div>
                                 </div>
                             </div>
@@ -118,7 +131,11 @@ export default function AddInvetory({ data }) {
                                 Remarks
                             </label>
                             <div className="control">
-                                <textarea className="textarea" rows={1} name="remarks" required></textarea>
+                                <textarea className="textarea" rows={1} name="remarks"
+                                    defaultValue={
+                                        data.remarks
+                                    }
+                                    required></textarea>
                             </div>
                         </div>
                         <hr />
@@ -142,46 +159,11 @@ export default function AddInvetory({ data }) {
                                                         <div className="field">
                                                             <div className="control">
                                                                 {/* Autocomplete for name field */}
-                                                                <Autocomplete
-                                                                    getItemValue={(item) => item.name}
-                                                                    items={data}
-                                                                    renderItem={(item, isHighlighted) =>
-                                                                        <div style={{ background: isHighlighted ? 'lightgray' : 'white', padding: '0px 5px' }}>
-                                                                            <span>{item.name}</span>
-                                                                        </div>
+                                                                <input type="text" className="input"
+                                                                    disabled={true}
+                                                                    defaultValue={
+                                                                        herb.herb_name
                                                                     }
-                                                                    shouldItemRender={(item, value) => item.name.toLowerCase().indexOf(value.toLowerCase()) > -1}
-                                                                    renderInput={(props) =>
-                                                                        <input
-                                                                            {...props}
-                                                                            className="input"
-                                                                            placeholder="Herb Name"
-                                                                            required
-                                                                        />
-                                                                    }
-                                                                    menuStyle={{
-                                                                        borderRadius: '3px',
-                                                                        boxShadow: '0 2px 12px rgba(0, 0, 0, 0.1)',
-                                                                        background: 'rgba(255, 255, 255, 0.9)',
-                                                                        padding: '2px 0',
-                                                                        position: 'fixed',
-                                                                        zIndex: '2',
-                                                                        overflow: 'auto',
-                                                                        maxHeight: '200px', // TODO: don't cheat, let it flow to the bottom
-                                                                    }}
-
-                                                                    value={herb.name}
-                                                                    onChange={(e, value) => {
-                                                                        var newHerbsList = [...herbsList];
-                                                                        newHerbsList[index].name = e.target.value;
-                                                                        setHerbsList(newHerbsList);
-                                                                    }}
-                                                                    onSelect={(value, item) => {
-                                                                        var newHerbsList = [...herbsList];
-                                                                        newHerbsList[index].name = item.name;
-                                                                        newHerbsList[index].id = item.id;
-                                                                        setHerbsList(newHerbsList);
-                                                                    }}
                                                                 />
                                                             </div>
                                                         </div>
@@ -212,6 +194,7 @@ export default function AddInvetory({ data }) {
                                                     <td>
                                                         <button type="button" className="button is-small is-warning" onClick={() => {
                                                             setHerbsList(herbsList.filter((_, i) => i !== index))
+                                                            handleDeleteHerb(data.purchase_id, herb.herb_id, index)
                                                         }}>
                                                             <span className="icon">
                                                                 ❌
@@ -228,19 +211,6 @@ export default function AddInvetory({ data }) {
                         </div>
                         {/* Button to add new herb item */}
                         <div className="buttons">
-                            <button type="button" className="button is-primary is-small" onClick={() => {
-                                setHerbsList([...herbsList, {
-                                    id: '',
-                                    name: '',
-                                    quantity: 0,
-                                    purchase_price: 0,
-                                }])
-                            }}>
-                                <span className="icon">
-                                    ➕
-                                </span>
-                                <span>Add New Herb</span>
-                            </button>
                             <button className="button" disabled>
                                 Total Amount: {totalAmount}
                             </button>
@@ -249,23 +219,47 @@ export default function AddInvetory({ data }) {
                         <hr />
                         <div className="field">
                             <div className="control">
-                                <button type="submit" className="button is-success">
-                                    Save
-                                </button>
+                                <div className="buttons">
+                                    <button type="submit" className="button is-success">
+                                        Save
+                                    </button>
+                                    <button type="button" className="button is-danger" onClick={() => {
+                                        router.back()
+                                    }}>
+                                        Cancel
+                                    </button>
+                                </div>
+
                             </div>
                         </div>
                     </form>
                 </div>
             </div >
+
         </Container >
     )
 }
 
-export async function getServerSideProps() {
 
-    const result: any = await database.query(`SELECT name, id FROM herbs`)
+export async function getServerSideProps(context) {
+
+    // get the invoice data by id
+    const result: any = await database.query(`SELECT * FROM purchases WHERE id = ${context.query.id}`)
+    // get the herbs data by this invoice id
+    const herbsResult: any = await database.query(`SELECT * FROM purchase_herbs WHERE purchase_id = ${context.query.id}`)
+    const herbsAutoCompleteList: any = await database.query(`SELECT * FROM herbs`)
     // convert result to json
-    const data = JSON.parse(JSON.stringify(result))
+    var data: any = {}
+    data.date = result[0].date;
+    data.invoice_no = result[0].invoice_no;
+    data.remarks = result[0].remarks;
+    data.total_amount = result[0].total_amount;
+    data.purchase_date = result[0].purchase_date
+    data.purchase_id = context.query.id;
+    data.herbsList = JSON.parse(JSON.stringify(herbsResult));
+    data.herbsAutoCompleteList = JSON.parse(JSON.stringify(herbsAutoCompleteList));
+    data = JSON.parse(JSON.stringify(data));
+
     database.end()
     return {
         props: {

@@ -138,6 +138,7 @@ export async function getServerSideProps(context) {
     const result: any = await database.query(`SELECT * FROM herbs WHERE id = ${context.query.id}`)
     // convert result to json
     const data = JSON.parse(JSON.stringify(result))[0]
+    database.end()
     return {
         props: {
             data
