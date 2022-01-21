@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Execute from '../../../lib/execute'
-
+import { addHerbHistory, removeHerbHistories } from "../../../lib/herbHistory";
 // a function to delete an existing invoice and all the herbs added to it
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
@@ -17,17 +17,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const quantity = previous_quantity[herb].quantity
                 // update the quantity in the herbs table
                 const update_quantity = await Execute(`update herbs set quantity = quantity - ${quantity} where id = '${herb_id}'`)
+                // get the herb name
+                const herb_name = await Execute(`select name from herbs where id = '${herb_id}'`)
             }
             // now delete all the herbs from the purchase_herbs table where the purchase_id is the same as the one passed in the request
             const delete_purchase_herbs = await Execute(`delete from purchase_herbs where purchase_id = '${purchase_id}'`)
             // now delete the purchase from the purchases table
-            const delete_purchase = await Execute(`delete from purchases where id = '${purchase_id}'`)
-
+            const delete_purchase = await Execute(`delete from purchases where id = ${purchase_id}`)
+            // now remove the herb history for the purchase_id
+            const remove_herb_history = await removeHerbHistories(purchase_id)
             res.status(200).json({
                 message: "Invoice updated successfully"
             })
         }
         catch (err) {
+            console.log(err)
             res.status(500).json({
                 message: "Error updating invoice"
             })

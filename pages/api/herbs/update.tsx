@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Execute from '../../../lib/execute'
-
+import { addHerbHistory } from "../../../lib/herbHistory";
 // update the herb with the given details
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
@@ -8,6 +8,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             // update query 
             const result = await Execute(`UPDATE herbs SET name = '${name}', botanical_name = '${botanical_name}', unit = '${unit}', quantity = '${quantity}', reorder_level = '${reorder_level}', purchase_price = '${purchase_price}', selling_price = '${selling_price}' WHERE id = ${id}`)
+            // add a history to the herb
+            const herb_history = await addHerbHistory(id, name, quantity, "Updated", null)
             res.status(200).json({ message: "Herb updated successfully", result })
         } catch (err) {
             console.log("this is the error", err)

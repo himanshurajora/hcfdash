@@ -51,3 +51,20 @@ create table purchase_herbs (
     foreign key (purchase_id) references purchases(id),
     foreign key (herb_id) references herbs(id)
 );
+
+-- A table to store herbs_history
+-- This table will store the details of the herbs purchased and consumed
+-- message column will be used to store the message of the transaction like "Herb Purchased" or "Herb Consumed"
+drop table if exists herbs_history;
+
+create table herbs_history (
+    id int not null auto_increment,
+    herb_id int,
+    herb_name varchar(255) not null,
+    quantity float not null,
+    message varchar(255) not null,
+    purchase_id int,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp on update current_timestamp,
+    primary key (id),
+);

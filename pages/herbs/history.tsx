@@ -7,9 +7,9 @@ import Container from "../../components/Container/Container";
 import exportCSV from "../../lib/exportCSV";
 import { useRouter } from "next/router";
 
-export default function ViewHerbs({ data }) {
-
-    const [herbs, setHerbs] = useState(data)
+// a react component to show history table for herbs
+export default function HerbsHistory({ data }) {
+    const [herbHistories, setHerbHistories] = useState(data)
     const [maxItems, setMaxItems] = useState(50)
     const [page, setPage] = useState(1)
     const [sort, setSort] = useState("None")
@@ -17,112 +17,36 @@ export default function ViewHerbs({ data }) {
     const [selectedHerbs, setSelectedHerbs] = useState([])
     const router = useRouter()
     const [search, setSearch] = useState<string>(router.query.search as string)
-    // on sort and sort type change useEffect
-    useEffect(() => {
-        handleSort(sort, sortType)
-    }, [sort, sortType])
 
-    // on search change useEffect
-    useEffect(() => {
-        if (search) {
-            handleSearch()
-        } else {
-            setHerbs(data)
-        }
-    }, [search])
-
-    // function to handle deleting of a herb
-    const handleHerbDelete = (id) => {
-        if (confirm("Are You Sure You Want To Delete It")) {
+    const handleDeleteHerbHistory = async (id: number) => {
+        if (confirm("Are you sure you want to delete this herb history?")) {
             try {
-                const result = axios.post('/api/herbs/delete', { id })
+                const result = axios.post(`/api/herbs/history/delete`,
+                    {
+                        id
+                    })
                 toast.promise(result, {
-                    loading: 'Deleting herb...',
+                    loading: "Deleting herb history...",
                     success: () => {
-                        setHerbs(herbs.filter(herb => herb.id !== id))
-                        return 'Successfully deleted herb'
+                        setHerbHistories(herbHistories.filter(herbHistory => herbHistory.id !== id))
+                        return "Herb history deleted successfully"
                     },
-                    error: (err) => { console.log(err.message); return 'Error.. Make Sure To The Name is Unique' }
-                }, { duration: 1000 });
-            } catch (err) {
-                console.log(err);
+                    error: "Error deleting herb history"
+                })
+            }
+            catch (err) {
+                console.log(err)
+                toast.error("Error deleting herb history")
             }
         } else {
-            toast.error('Cancelled, It might be a "Mistake" 👩🏻‍💻')
+            toast.error("Okey not removed, Mistakes are what make us human")
         }
     }
-
-    const handleDeleteMultiple = () => {
-        // delete multiple herbs using the selectedHerbs array
-        // and api /api/herbs/deletemultiple
-        if (selectedHerbs.length > 0) {
-            if (confirm("Are You Sure You Want To Delete Them")) {
-                try {
-                    const result = axios.post('/api/herbs/deletemultiple', { selectedHerbs })
-                    toast.promise(result, {
-                        loading: 'Deleting herbs...',
-                        success: () => {
-                            setHerbs(herbs.filter(herb => !selectedHerbs.includes(herb.id)))
-                            return 'Successfully deleted herbs'
-                        },
-                        error: (err) => { console.log(err.message); return 'Error.. Make Sure To The Name is Unique' }
-                    }, { duration: 1000 });
-                } catch (err) {
-                    console.log(err);
-                }
-            } else {
-                toast.error('Cancelled, It might be a "Mistake" 👩🏻‍💻')
-            }
-        } else {
-            toast.error('No herbs selected')
-        }
-    }
-
-    // function to handle live search
-    const handleSearch = () => {
-        setHerbs(herbs.filter(herb => herb.name.toLowerCase().includes(search.toLowerCase())))
-    }
-
-    const handleSort = (sort_p, sortType_p) => {
-        switch (sort_p) {
-            case "None":
-                setHerbs(data)
-                break;
-            case "Name":
-                if (sortType_p === "ASC") {
-                    setHerbs([...herbs.sort((a, b) => a.name.localeCompare(b.name))])
-                }
-                else {
-                    setHerbs([...herbs.sort((a, b) => b.name.localeCompare(a.name))])
-                }
-                toast.success("Sorted By " + sort + " By " + sortType)
-                break;
-            case "Quantity":
-                if (sortType_p === "ASC") {
-                    setHerbs([...herbs.sort((a, b) => a.quantity - b.quantity)])
-                }
-                else {
-                    setHerbs([...herbs.sort((a, b) => b.quantity - a.quantity)])
-                }
-                toast.success("Sorted By " + sort + " By " + sortType)
-                break;
-            case "CreatedAt":
-                if (sortType_p === "ASC") {
-                    setHerbs([...herbs.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())])
-                }
-                else {
-                    setHerbs([...herbs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())])
-                }
-                toast.success("Sorted By " + sort + " By " + sortType)
-            default:
-                break;
-        }
-        // toast 
-    }
-
     return <>
         <Container>
-            <h1 className="title is-4">List Of Herbs</h1>
+            <div className="title">
+                Herbs History
+            </div>
             <div className="columns is-justify-content-space-between is-multiline">
                 <div className="column is-12-tablet">
                     <div className="columns is-justify-content-space-between">
@@ -136,10 +60,10 @@ export default function ViewHerbs({ data }) {
                                     <option value="100">100</option>
                                 </select>
                             </div>
-                            <button className="button is-success mx-1" onClick={(e) => {
+                            <button className="button is-success mx-3" onClick={(e) => {
                                 if (confirm("Are You Sure You Want To Export It?")) {
                                     if (data.length) {
-                                        exportCSV(e, data, Object.keys(data[0]), "Herbs.csv")
+                                        exportCSV(e, data, Object.keys(data[0]), "Herbs_History.csv")
                                         // show toast
                                         toast.success("Successfully Exported To CSV")
                                     } else {
@@ -147,32 +71,26 @@ export default function ViewHerbs({ data }) {
                                     }
                                 }
                             }}>Export To CSV 🧾</button>
-                            <button className="button is-danger mr-1" disabled={selectedHerbs.length === 0}
+                            <button className="button is-danger mx-3" disabled={selectedHerbs.length === 0}
                                 onClick={() => {
-                                    handleDeleteMultiple()
+                                    // handleDeleteMultiple()
                                     setSelectedHerbs([])
                                 }}
                             >
                                 Delete Multiple
                             </button>
-                            <Link href={"/herbs/lowlevel"}>
-                                <button className="button is-warning mr-1">
-                                   Below Low Level
-                                </button>
-                            </Link>
-                            <Link href={"/herbs/history"}>
-                                <button className="button is-primary mr-1">
-                                   Herbs History
+                            <Link href={"/herbs/view"}>
+                                <button className="button is-warning">
+                                    All Herbs
                                 </button>
                             </Link>
                         </div>
                     </div>
                 </div>
-                <div className="column is-1-laptop is-12-tablet">
+                {/* <div className="column is-1-laptop is-12-tablet">
                     <div className="columns is-multiline">
                         <div className="column">
                             <div className="field has-addons">
-                                {/* Sort By Name Or Quantity */}
                                 <div className="control">
                                     <div className="select">
                                         <select name="sort" defaultValue={"None"} onChange={(e) => {
@@ -185,7 +103,6 @@ export default function ViewHerbs({ data }) {
                                         </select>
                                     </div>
                                 </div>
-                                {/* Acending Or Descending */}
                                 <div className="control">
                                     <div className="select">
                                         <select name="sort" value={sortType} onChange={(e) => { setSortType(e.target.value); }}>
@@ -197,13 +114,12 @@ export default function ViewHerbs({ data }) {
                             </div>
                         </div>
                         <div className="column">
-                            {/* Set the search value to search parameter in query */}
                             <input type="text" className="input" value={search} onChange={(e) => {
                                 setSearch(e.target.value)
                             }} placeholder="Search" />
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
             <div className="table-container">
                 <table className="table is-hoverable is-narrow is-fullwidth">
@@ -212,18 +128,14 @@ export default function ViewHerbs({ data }) {
                             <th>&nbsp;</th>
                             <th>S.N.</th>
                             <th>Name</th>
-                            <th>Botanical Name</th>
-                            <th>Unit</th>
-                            <th>Quantity</th>
-                            <th>Low Level</th>
-                            <th>Purchase Price</th>
-                            <th>Selling Price</th>
+                            <th>Affected Qty.</th>
+                            <th>Message</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
-                            herbs.map((herb, index) => {
+                            herbHistories.map((herb, index) => {
                                 if (index < maxItems * page && index >= maxItems * (page - 1)) {
                                     return <tr key={herb.id}>
                                         <td>
@@ -242,33 +154,26 @@ export default function ViewHerbs({ data }) {
                                         </td>
                                         <td>
                                             {/* Keep only stating 20 characters */}
-                                            <Link href={`/herbs/${herb.id}?search=${search ? search : ""}`}>{herb.name.length > 20 ? herb.name.substring(0, 20) + "..." : herb.name}</Link>
-                                        </td>
-                                        <td>
-                                            {/* Keep only stating 20 characters */}
-                                            {herb.botanical_name.length > 20 ? herb.botanical_name.substring(0, 20) + "..." : herb.botanical_name}
-                                        </td>
-                                        <td>{herb.unit}
+                                            {herb.herb_name.length > 20 ? herb.herb_name.substring(0, 20) + "..." : herb.herb_name}
                                         </td>
                                         <td>{herb.quantity}
                                         </td>
-                                        <td>{herb.reorder_level}
-                                        </td>
-                                        <td>{herb.purchase_price}
-                                        </td>
-                                        <td>{herb.selling_price}
+                                        <td>{herb.message}
+                                            {
+                                                herb.purchase_id ? <Link href={`/herbs/invoice/${herb.purchase_id}`}>
+                                                    <a className="mx-1">
+                                                    View Invoice
+                                                    </a>
+                                                </Link> : null
+
+                                            }
                                         </td>
                                         {/* action icons */}
                                         <td>
                                             <div className="buttons has-addons">
-                                                <Link href={`/herbs/${herb.id}?search=${search}`}>
-                                                    <p className="button is-small is-info">
-                                                        <span className="icon ico is-small">
-                                                            📝
-                                                        </span>
-                                                    </p>
-                                                </Link>
-                                                <a onClick={() => { handleHerbDelete(herb.id) }} className="button is-small is-danger">
+                                                <a onClick={() => {
+                                                    handleDeleteHerbHistory(herb.id)
+                                                }} className="button is-small is-danger">
                                                     <span className="icon ico is-small">
                                                         🗑️
                                                     </span>
@@ -288,7 +193,7 @@ export default function ViewHerbs({ data }) {
                 <a className="pagination-next" onClick={() => { setPage(page + 1) }}>Next page</a>
                 <ul className="pagination-list">
                     {
-                        Array(Math.ceil(herbs.length / maxItems)).fill(0).map((_, index) => {
+                        Array(Math.ceil(herbHistories.length / maxItems)).fill(0).map((_, index) => {
                             // if there are too many pages then we will show only the first 5 pages
                             if (index < 5) {
                                 return <li key={index}>
@@ -298,7 +203,7 @@ export default function ViewHerbs({ data }) {
                                 </li>
                             }
                             // show the last 5 pages
-                            else if (index >= herbs.length / maxItems - 5) {
+                            else if (index >= herbHistories.length / maxItems - 5) {
                                 return (
                                     <>
                                         <li key={index}>
@@ -320,20 +225,23 @@ export default function ViewHerbs({ data }) {
                     }
                 </ul>
             </nav>
-
         </Container>
     </>
 }
 
-export async function getServerSideProps() {
 
-    const result: any = await database.query(`SELECT * FROM herbs`)
-    // convert result to json
-    const data = JSON.parse(JSON.stringify(result))
-    database.end()
+// getServerSideProps is a function that gets called on every request to the page
+// it is used to get data from the database and pass it to the page
+export async function getServerSideProps() {
+    // get the data from the database
+    var data = await database.query(`select * from herbs_history`)
+    // convert the data to json
+    data = JSON.parse(JSON.stringify(data))
+    // return the data to the page
     return {
         props: {
-            data
+            data: data
         }
     }
 }
+

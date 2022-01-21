@@ -2,8 +2,10 @@ import { FormEvent, useRef } from "react";
 import axios from "axios";
 import Container from "../../components/Container/Container";
 import toast, { Toaster } from "react-hot-toast";
-
+import { useRouter } from "next/router";
 export default function AddHerbs() {
+
+    const router = useRouter();
 
     const handleAddHerb = async (e: FormEvent) => {
         e.preventDefault()
@@ -36,7 +38,10 @@ export default function AddHerbs() {
             })
             toast.promise(result, {
                 loading: 'Adding herb...',
-                success: 'Successfully added herb',
+                success: ()=>{
+                    router.push("/herbs/view/?search=" + name)
+                    return "Herb added successfully"
+                },
                 error: (err) => { console.log(err.message); return 'Error.. Make Sure To The Name is Unique' }
             });
 

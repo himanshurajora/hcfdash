@@ -1,13 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Execute from '../../../lib/execute'
-
+import { addHerbHistory } from "../../../lib/herbHistory";
 
 // a function to update existing invoice, and add list of herbs to it, and quantity of each herb added to existing quantity of herb
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
-        const {invoice_no, remarks, total_amount, herbsList, purchase_id } = req.body
+        const { invoice_no, remarks, total_amount, herbsList, purchase_id } = req.body
         try {
-            const purchases = await Execute(`update purchases set remarks = '${remarks}', total_amount = ${total_amount}, invoice_no = ${invoice_no}, updated_at = now() where id = '${purchase_id}'`)
+            await Execute(`update purchases set remarks = '${remarks}', total_amount = ${total_amount}, invoice_no = ${invoice_no}, updated_at = now() where id = '${purchase_id}'`)
             // get the previous quantity of each herb
             const previous_quantity = await Execute(`select herb_id, quantity from purchase_herbs where purchase_id = '${purchase_id}'`)
             // substract the previous quantity from the current quantity
@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 // get the quantity
                 const quantity = previous_quantity[herb].quantity
                 // update the quantity in the herbs table
-                const update_quantity = await Execute(`update herbs set quantity = quantity - ${quantity} where id = '${herb_id}'`)
+                await Execute(`update herbs set quantity = quantity - ${quantity} where id = '${herb_id}'`)
             }
             // now loop through the list of herbs
             for (const herb in herbsList as any) {
@@ -27,11 +27,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 // get the quantity
                 const quantity = herbsList[herb].quantity
                 // update the quantity in the herbs table
-                const update_quantity = await Execute(`update herbs set quantity = quantity + ${quantity} where id = '${herb_id}'`)
+                await Execute(`update herbs set quantity = quantity + ${quantity} where id = '${herb_id}'`)
                 // update the quantity and purchase_price in the purchase_herbs table
-                const update_purchase_herbs = await Execute(`update purchase_herbs set quantity = ${quantity}, purchase_price = ${herbsList[herb].purchase_price} where purchase_id = '${purchase_id}' and herb_id = '${herb_id}'`)
+                await Execute(`update purchase_herbs set quantity = ${quantity}, purchase_price = ${herbsList[herb].purchase_price} where purchase_id = '${purchase_id}' and herb_id = '${herb_id}'`)
+                // get the herb name
+                const herb_name = await Execute(`select name from herbs where id = '${herb_id}'`)
+                // add the quantity to the history
+                await addHerbHistory(herb_id, herb_name[0].name, quantity, "Purchase Update", purchase_id)
             }
-        
+
             res.status(200).json({
                 message: "Invoice updated successfully"
             })

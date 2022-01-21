@@ -66,17 +66,27 @@ export default function ViewInvoices({ data }) {
                                         <option value="100">100</option>
                                     </select>
                                 </div>
-                                <button className="button is-success mx-3" onClick={(e) => {
-                                    if (confirm("Are You Sure You Want To Export It?")) {
-                                        if (data.length) {
-                                            exportCSV(e, data, Object.keys(data[0]), "Invoices.csv")
-                                            // show toast
-                                            toast.success("Successfully Exported To CSV")
-                                        } else {
-                                            toast.error("No Data To Export")
+                                <div className="buttons">
+                                    <button className="button is-success mx-3" onClick={(e) => {
+                                        if (confirm("Are You Sure You Want To Export It?")) {
+                                            if (data.length) {
+                                                exportCSV(e, data, Object.keys(data[0]), "Invoices.csv")
+                                                // show toast
+                                                toast.success("Successfully Exported To CSV")
+                                            } else {
+                                                toast.error("No Data To Export")
+                                            }
                                         }
-                                    }
-                                }}>Export To CSV 🧾</button>
+                                    }}>Export To CSV 🧾</button>
+                                    <div className="button is-primary">
+                                        <Link href="/herbs/history">
+                                            <p>
+                                                Herbs History
+                                            </p>
+                                        </Link>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                         <div className="column">

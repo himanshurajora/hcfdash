@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Execute from '../../../lib/execute'
-
+import { addHerbHistory } from "../../../lib/herbHistory";
 
 // a function to create invoice, and add list of herbs to it, and quantity of each herb added to existing quantity of herb
 declare interface IHerb {
@@ -60,7 +60,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 // get the herb name
                 const herb_name = herbsList[herb].name
                 // update the quantity of each herb
-                const update_quantity = await Execute(`update herbs set quantity = quantity + ${quantity} where id = ${herb_id}`)
+                await Execute(`update herbs set quantity = quantity + ${quantity} where id = ${herb_id}`)
+                // add the herb history
+                await addHerbHistory(herb_id, herb_name, quantity, "Purchased", purchase_id)
             }
             // return the response
             res.status(200).json({
