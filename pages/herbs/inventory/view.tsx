@@ -48,11 +48,11 @@ export default function ViewInvoices({ data }) {
         <Container>
             <h1 className="title is-4">List Of Herbs</h1>
             <div className="columns is-justify-content-space-between is-multiline">
-                <div className="column is-12-tablet">
+                {/* <div className="column is-12-tablet">
                     <div className="columns is-justify-content-space-between">
 
                     </div>
-                </div>
+                </div> */}
                 <div className="column is-1-laptop is-12-tablet">
                     <div className="columns is-multiline">
                         <div className="column">
@@ -66,7 +66,6 @@ export default function ViewInvoices({ data }) {
                                         <option value="100">100</option>
                                     </select>
                                 </div>
-                                <div className="buttons">
                                     <button className="button is-success mx-3" onClick={(e) => {
                                         if (confirm("Are You Sure You Want To Export It?")) {
                                             if (data.length) {
@@ -85,8 +84,6 @@ export default function ViewInvoices({ data }) {
                                             </p>
                                         </Link>
                                     </div>
-                                </div>
-
                             </div>
                         </div>
                         <div className="column">
