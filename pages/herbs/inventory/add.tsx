@@ -4,10 +4,11 @@ import Container from "../../../components/Container/Container";
 import toast, { Toaster } from "react-hot-toast";
 import database from "../../../lib/database";
 import Autocomplete from "react-autocomplete";
+import { useRouter } from "next/router";
 export default function AddInvetory({ data }) {
     var date = new Date();
     const [dateInput, setDateInput] = useState(`${date.getFullYear()}-${date.getMonth() + 1 < 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${date.getDate() < 9 ? '0' + date.getDate() : date.getDate()}`)
-
+    const router = useRouter()
     const [herbsList, setHerbsList] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
     useEffect(() => {
@@ -72,7 +73,9 @@ export default function AddInvetory({ data }) {
                     })
                     toast.promise(result, {
                         loading: 'Adding purchase...',
-                        success: 'Successfully added purchase',
+                        success: ()=>{setTimeout(() => {
+                            router.push('/herbs/inventory/view')
+                        }, 400); return 'Successfully added purchase'},
                         error: (err) => { console.log(err.message); return 'Error.. Make Sure Invoice No. Is Unique' }
                     });
                 } catch (err) {
@@ -83,6 +86,7 @@ export default function AddInvetory({ data }) {
             }
 
         }
+        
     }
 
     return (

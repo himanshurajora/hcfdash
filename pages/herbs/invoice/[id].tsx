@@ -25,25 +25,32 @@ export default function EditInvoice({ data }) {
         console.log(herbsList)
     }, [herbsList])
 
-    const handleDeleteHerb = async (purchase_id, herb_id,  index) => {
+    // !Fix - By Mistake in this function i names herb_id - id and id - herb_id
+    // But don't fix it, it will work fine, but it will be confusing for the developer
+    const handleDeleteHerb = async (purchase_id, herb_id, id, index, price) => {
         // send post request to /api/invoice/removeherb
-        if(confirm("Are you sure you want to delete this herb?")) {
+        if (confirm("Are you sure you want to delete this herb?")) {
             const response = axios.post("/api/invoice/removeherb", {
                 purchase_id,
                 herb_id,
-                quantity: data.herbsList[index].quantity
+                id,
+                quantity: data.herbsList[index].quantity,
+                price
             })
             // toast the response
             toast.promise(response, {
                 loading: "Removing herb...",
-                success: "Herb removed successfully",
+                success: () => {
+                    // update the herbsList
+                    const newHerbsList = [...herbsList]
+                    newHerbsList.splice(index, 1)
+                    setHerbsList(newHerbsList)
+                    return "Herb removed successfully"
+                },
                 error: "Error removing herb"
             })
-            // update the herbsList
-            const newHerbsList = [...herbsList]
-            newHerbsList.splice(index, 1)
-            setHerbsList(newHerbsList)
-        }else{
+
+        } else {
             // toast 
             toast.error("Herb not removed, It might be a mistake")
         }
@@ -193,8 +200,7 @@ export default function EditInvoice({ data }) {
                                                     </td>
                                                     <td>
                                                         <button type="button" className="button is-small is-warning" onClick={() => {
-                                                            setHerbsList(herbsList.filter((_, i) => i !== index))
-                                                            handleDeleteHerb(data.purchase_id, herb.herb_id, index)
+                                                            handleDeleteHerb(data.purchase_id, herb.id, herb.herb_id, index, herb.purchase_price)
                                                         }}>
                                                             <span className="icon">
                                                                 ❌

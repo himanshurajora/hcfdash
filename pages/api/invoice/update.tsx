@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === "POST") {
         const {invoice_no, remarks, total_amount, herbsList, purchase_id } = req.body
         try {
-            const purchases = await Execute(`update purchases set remarks = '${remarks}', total_amount = ${total_amount}, invoice_no = ${invoice_no} where id = '${purchase_id}'`)
+            const purchases = await Execute(`update purchases set remarks = '${remarks}', total_amount = ${total_amount}, invoice_no = ${invoice_no}, updated_at = now() where id = '${purchase_id}'`)
             // get the previous quantity of each herb
             const previous_quantity = await Execute(`select herb_id, quantity from purchase_herbs where purchase_id = '${purchase_id}'`)
             // substract the previous quantity from the current quantity
