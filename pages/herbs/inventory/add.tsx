@@ -24,9 +24,6 @@ export default function AddInvetory({ data }) {
         }
     }, [herbsList])
 
-    const handleAddHerb = async (e: FormEvent) => {
-
-    }
 
     const handleAddPurchase = async (e: FormEvent) => {
         e.preventDefault()
@@ -75,7 +72,7 @@ export default function AddInvetory({ data }) {
                         success: ()=>{setTimeout(() => {
                             router.push('/herbs/inventory/view')
                         }, 400); return 'Successfully added purchase'},
-                        error: (err) => { console.log(err.message); return 'Error.. Make Sure Invoice No. Is Unique' }
+                        error: (err) => { console.log(err.message); return 'Some error Occured!' }
                     });
                 } catch (err) {
                     console.log(result)
