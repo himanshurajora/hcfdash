@@ -22,7 +22,6 @@ export default function AddInvetory({ data }) {
         } else {
             setTotalAmount(0)
         }
-        console.log(herbsList)
     }, [herbsList])
 
     const handleAddHerb = async (e: FormEvent) => {

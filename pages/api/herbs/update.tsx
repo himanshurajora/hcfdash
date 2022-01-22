@@ -9,7 +9,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // update query 
             const result = await Execute(`UPDATE herbs SET name = '${name}', botanical_name = '${botanical_name}', unit = '${unit}', quantity = '${quantity}', reorder_level = '${reorder_level}', purchase_price = '${purchase_price}', selling_price = '${selling_price}' WHERE id = ${id}`)
             // add a history to the herb
-            const herb_history = await addHerbHistory(id, name, quantity, "Updated", null)
+            console.log(id, name, quantity, "Updated", null)
+            await addHerbHistory(id, name, quantity, "Updated", null)
             res.status(200).json({ message: "Herb updated successfully", result })
         } catch (err) {
             console.log("this is the error", err)

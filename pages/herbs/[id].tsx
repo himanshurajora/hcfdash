@@ -71,10 +71,10 @@ export default function Edit({ data }) {
                 </div>
                 <div className="field">
                     <label className="label is-small">
-                        Unit:
+                        Quantity:
                     </label>
                     <div className="control">
-                        <input type="text" className="input" name="unit" defaultValue={data.unit} required />
+                        <input type="number" step={0.00001} className="input" name="quantity" defaultValue={data.quantity} required />
                     </div>
                 </div>
                 <div className="field">
@@ -82,8 +82,8 @@ export default function Edit({ data }) {
                         Quantity:
                     </label>
                     <div className="control">
-                        <select className="input" name="unit" required>
-                            <option value="g">gm</option>
+                        <select className="input" defaultValue={data.unit} name="unit" required>
+                            <option value="g">gms</option>
                             <option value="kg">kg</option>
                             <option value="l">l</option>
                             <option value="ml">ml</option>
